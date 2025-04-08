@@ -3,6 +3,11 @@ from pydantic import BaseModel
 import joblib
 import numpy as np
 from typing import Union
+import os
+from pymongo import MongoClient
+from dotenv import load_dotenv
+
+load_dotenv()  # Load environment variables from .env
 
 app = FastAPI()
 
@@ -19,7 +24,9 @@ class PredictRequest(BaseModel):
 
 # Load the diabetes model
 try:
-    diabetes_model = joblib.load(open('src/models/model.pkl', 'rb'))
+    current_dir = os.path.dirname(__file__)
+    model_path = os.path.join(current_dir, 'models/model.pkl')
+    diabetes_model = joblib.load(open(model_path, 'rb'))
 except FileNotFoundError:
     raise HTTPException(status_code=500, detail="Model file not found.")
 except Exception as e:
@@ -27,11 +34,25 @@ except Exception as e:
 
 # Load the scaler if it was saved separately
 try:
-    scaler = joblib.load(open('src/models/scaler.pkl', 'rb'))
+    scaler_path = os.path.join(current_dir, 'models/scaler.pkl')
+    scaler = joblib.load(open(scaler_path, 'rb'))
 except FileNotFoundError:
     raise HTTPException(status_code=500, detail="Scaler file not found.")
 except Exception as e:
     raise HTTPException(status_code=500, detail=f"Failed to load scaler: {e}")
+
+# Connect to MongoDB on startup
+@app.on_event("startup")
+def startup_db_client():
+    app.mongodb_client = MongoClient(os.getenv("MONGODB_CONNECTION_URI"), server_api='1')
+    app.database = app.mongodb_client[os.getenv("DB_NAME")]
+    app.collection = app.database[os.getenv("COLLECTION_NAME")]
+    print("Connected to the MongoDB database!")
+
+# Close MongoDB connection on shutdown
+@app.on_event("shutdown")
+def shutdown_db_client():
+    app.mongodb_client.close()
 
 @app.post('/diabetes_prediction')
 def diabetes_prediction(request: PredictRequest):
@@ -65,6 +86,11 @@ def diabetes_prediction(request: PredictRequest):
 @app.get("/")
 def read_root():
     return {"Welcome to the diabetes prediction API"}
+
+@app.get("/data")
+async def read_data():
+    data = app.collection.find()
+    return list(data)
 
 if __name__ == "__main__":
     import uvicorn
