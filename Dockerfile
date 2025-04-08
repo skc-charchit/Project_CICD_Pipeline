@@ -14,14 +14,23 @@ COPY src/models /app/src/models
 # Copy mongodb.py script
 COPY mongodb.py /app/
 
+# Copy preprocessed_data.csv
+COPY preprocessed_data.csv /app/
+
+# Copy run.sh script
+COPY run.sh /app/
+
 # Copy requirements.txt
 COPY requirements.txt .
 
 # Install dependencies
-RUN pip install --no-cache-dir --upgrade -r requirements.txt python-dotenv pymongo pandas
+RUN pip install --no-cache-dir --upgrade -r requirements.txt python-dotenv pymongo pandas joblib motor
 
-# Make port 8000 available to the world outside this container
-EXPOSE 8000
+# Make port 8001 available to the world outside this container
+EXPOSE 8001
+
+# Make the script executable inside the container
+RUN chmod +x /app/run.sh
 
 # Run the script when the container launches
-CMD ["sh", "-c", "python mongodb.py && uvicorn src.main:app --host 0.0.0.0 --port 8000"]
+CMD ["/app/run.sh"]

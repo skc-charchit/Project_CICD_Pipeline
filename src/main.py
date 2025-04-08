@@ -5,6 +5,7 @@ import numpy as np
 from typing import Union
 import os
 from pymongo import MongoClient
+from pymongo.server_api import ServerApi
 from dotenv import load_dotenv
 
 load_dotenv()  # Load environment variables from .env
@@ -44,7 +45,8 @@ except Exception as e:
 # Connect to MongoDB on startup
 @app.on_event("startup")
 def startup_db_client():
-    app.mongodb_client = MongoClient(os.getenv("MONGODB_CONNECTION_URI"), server_api='1')
+    server_api = ServerApi('1')
+    app.mongodb_client = MongoClient(os.getenv("MONGODB_CONNECTION_URI"), server_api=server_api)
     app.database = app.mongodb_client[os.getenv("DB_NAME")]
     app.collection = app.database[os.getenv("COLLECTION_NAME")]
     print("Connected to the MongoDB database!")
@@ -88,10 +90,11 @@ def read_root():
     return {"Welcome to the diabetes prediction API"}
 
 @app.get("/data")
-async def read_data():
+def read_data():
     data = app.collection.find()
     return list(data)
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
+# Remove this block since you're running with uvicorn in Docker
+# if __name__ == "__main__":
+#     import uvicorn
+#     uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)

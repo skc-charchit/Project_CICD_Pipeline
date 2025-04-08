@@ -7,9 +7,13 @@ import os
 # Load environment variables from .env
 load_dotenv()
 
+# Print environment variable to verify it's loaded correctly
+print("MONGODB_CONNECTION_URI:", os.getenv("MONGODB_CONNECTION_URI"))
+
 # Connect to MongoDB using the connection string from .env
 uri = os.getenv("MONGODB_CONNECTION_URI")
-client = MongoClient(uri, server_api=ServerApi('1'))
+server_api = ServerApi('1')
+client = MongoClient(uri, server_api=server_api)
 
 # Send a ping to confirm a successful connection
 try:

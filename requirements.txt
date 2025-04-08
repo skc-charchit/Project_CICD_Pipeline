@@ -9,3 +9,4 @@ uvicorn
 joblib
 pydantic
 python-dotenv
+motor
