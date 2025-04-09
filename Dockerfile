@@ -8,13 +8,18 @@ WORKDIR /app
 # Copy project files
 COPY src /app/src
 COPY src/models /app/src/models
+COPY .env /app/
+# Copy mongodb.py script
 COPY mongodb.py /app/
+
+# Copy preprocessed_data.csv
 COPY preprocessed_data.csv /app/
-COPY Procfile /app/
+
+# Copy requirements.txt
 COPY requirements.txt .
 
 # Install dependencies
-RUN pip install --no-cache-dir --upgrade -r requirements.txt python-dotenv pymongo pandas joblib motor uvicorn
+RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
 # Set environment variable for port
 ENV PORT=8001
@@ -23,4 +28,4 @@ ENV PORT=8001
 EXPOSE 8001
 
 # Run the application directly using Uvicorn
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8001"]
+CMD ["sh", "-c", "uvicorn src.main:app --host 0.0.0.0 --port $PORT"]
