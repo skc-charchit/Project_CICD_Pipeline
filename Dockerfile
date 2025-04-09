@@ -2,11 +2,7 @@ FROM python:3.9-slim
 
 WORKDIR /app
 
-COPY src /app/src
-COPY .env /app/
-COPY mongodb.py /app/
-COPY preprocessed_data.csv /app/
-COPY requirements.txt .
+COPY . /app/
 
 RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
