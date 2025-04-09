@@ -4,20 +4,26 @@ WORKDIR /app
 
 COPY . /app/
 
+# Print the current working directory
+RUN pwd
+
+# List the contents of the working directory
+RUN ls -la
+
 # Install dependencies
 RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
-# Copy .env file into the container
-COPY .env .
-
-# Set environment variables from .env file
-RUN pip install python-dotenv
-RUN python -c "import os, dotenv; dotenv.load_dotenv(); \
-                print('MongoDB URI: ' + str(os.environ.get('MONGODB_CONNECTION_URI'))) ; \
-                print('DB Name: ' + str(os.environ.get('DB_NAME'))) ; \
-                print('Collection Name: ' + str(os.environ.get('COLLECTION_NAME')))"
-
+# Set environment variables
+ENV MONGODB_CONNECTION_URI=${MONGODB_CONNECTION_URI}
+ENV DB_NAME=${DB_NAME}
+ENV COLLECTION_NAME=${COLLECTION_NAME}
 ENV PORT=8001
+
+# Print environment variables for debugging purposes
+RUN echo "MongoDB URI: ${MONGODB_CONNECTION_URI}"
+RUN echo "DB Name: ${DB_NAME}"
+RUN echo "Collection Name: ${COLLECTION_NAME}"
+RUN echo "Port: ${PORT}"
 
 EXPOSE 8001
 
