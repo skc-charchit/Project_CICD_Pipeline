@@ -9,4 +9,4 @@ RUN pip install --no-cache-dir --upgrade -r requirements.txt
 ENV PORT=8001
 EXPOSE 8001
 
-CMD ["sh", "-c", "uvicorn src.main:app --host 0.0.0.0 --port $PORT"]
+CMD ["sh", "-c", "uvicorn src.main:app --host 0.0.0.0 --port ${PORT}"]
