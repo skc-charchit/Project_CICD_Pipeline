@@ -17,20 +17,20 @@ COPY mongodb.py /app/
 # Copy preprocessed_data.csv
 COPY preprocessed_data.csv /app/
 
-# Copy run.sh script
-COPY run.sh /app/
+# Copy Procfile
+COPY Procfile /app/
 
 # Copy requirements.txt
 COPY requirements.txt .
 
 # Install dependencies
-RUN pip install --no-cache-dir --upgrade -r requirements.txt python-dotenv pymongo pandas joblib motor
+RUN pip install --no-cache-dir --upgrade -r requirements.txt python-dotenv pymongo pandas joblib motor uvicorn
+
+# Set environment variable for port
+ENV PORT=8001
 
 # Make port 8001 available to the world outside this container
 EXPOSE 8001
 
-# Make the script executable inside the container
-RUN chmod +x /app/run.sh
-
-# Run the script when the container launches
-CMD ["/app/run.sh"]
+# Run the application using the Procfile
+CMD ["sh", "-c", "$(cat /app/Procfile | sed 's/web //')"]
