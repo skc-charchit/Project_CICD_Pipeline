@@ -29,3 +29,6 @@ EXPOSE 8001
 
 # Run the application directly using Uvicorn
 CMD ["sh", "-c", "uvicorn src.main:app --host 0.0.0.0 --port $PORT"]
+
+# Use the following command to build the Docker image
+# docker build -t myapp:latest .
