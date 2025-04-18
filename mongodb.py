@@ -11,7 +11,7 @@ load_dotenv()
 print("MONGODB_CONNECTION_URI:", os.getenv("MONGODB_CONNECTION_URI"))
 
 # Connect to MongoDB using the connection string from .env
-uri = os.getenv("MONGODB_CONNECTION_URI")
+uri = os.getenv("MONGODB_CONNECTION_URI").strip('"')  # Remove quotes if present
 server_api = ServerApi('1')
 client = MongoClient(uri, server_api=server_api)
 
@@ -31,11 +31,11 @@ print(df["Outcome"].value_counts())
 list_of_dict = df.to_dict(orient="records")
 
 # Access the database and collection
-db = client[os.getenv("DB_NAME")]
+db = client[os.getenv("DB_NAME").strip('"')]
 print(db.list_collection_names())
 
 # Create a collection if it doesn't exist
-collection_name = os.getenv("COLLECTION_NAME")
+collection_name = os.getenv("COLLECTION_NAME").strip('"')
 if collection_name not in db.list_collection_names():
     collection = db.create_collection(collection_name)
 else:
